@@ -1,8 +1,8 @@
 .transport-panel { display: grid; gap: 22px; }
 .transport-panel__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
 .transport-panel__eyebrow { margin: 0 0 9px; color: var(--rust); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .16em; }
-.transport-panel__heading h1 { margin: 0; font-family: var(--font-display); font-size: clamp(32px, 4vw, 44px); letter-spacing: -.045em; }
-.transport-panel__heading p:last-child { max-width: 680px; margin: 10px 0 0; color: var(--ink-soft); line-height: 1.7; }
+.transport-panel__heading h1 { margin: 0; font-family: var(--font-display); font-size: clamp(34px, 4vw, 46px); line-height: 1.12; letter-spacing: -.04em; }
+.transport-panel__heading p:last-child { max-width: 680px; margin: 10px 0 0; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
 .transport-panel__stamp { flex: 0 0 auto; padding: 8px 10px; border: 1px solid var(--mustard); border-radius: 0; background: #f8f0dc; color: #604817; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
 .transport-tabs { display: flex; width: fit-content; gap: 0; padding: 0; border: 1px solid var(--line-strong); border-radius: 0; background: var(--paper-light); }
 .transport-tabs button { min-height: 44px; padding: 0 18px; border: 0; border-right: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink-soft); font-weight: 800; }
@@ -117,3 +117,18 @@
 .transport-booking-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--navy); font-weight: 700; text-underline-offset: 4px; }
 .transport-booking-link:hover { color: var(--rust-dark); }
 .transport-platform-hint { overflow-wrap: anywhere; line-height: 1.6; }
+
+.transport-guide { display: grid; gap: 13px; padding: 18px 20px; border: 1px solid var(--line); border-left: 4px solid var(--mustard); background: var(--paper-light); }
+.transport-guide__head h2 { margin: 0; font-family: var(--font-display); font-size: 20px; letter-spacing: -.02em; }
+.transport-guide__head > p { margin: 6px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
+.transport-guide ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
+.transport-guide li { display: grid; align-content: start; gap: 5px; padding: 4px 16px; border-left: 1px solid var(--line-soft); }
+.transport-guide li:first-child { padding-left: 0; border-left: 0; }
+.transport-guide strong { color: var(--ink); font-size: 12px; }
+.transport-guide span { color: var(--ink-soft); font-size: 12px; line-height: 1.65; }
+
+@media (max-width: 540px) {
+  .transport-guide ul { grid-template-columns: 1fr; }
+  .transport-guide li, .transport-guide li:first-child { padding: 8px 0; border-left: 0; border-top: 1px solid var(--line-soft); }
+  .transport-guide li:first-child { border-top: 0; }
+}

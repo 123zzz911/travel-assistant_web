@@ -236,6 +236,14 @@ export function AssistantPanel({
               ))}
             </fieldset>
           )}
+          <section className="assistant-guide" aria-labelledby="assistant-guide-title">
+            <h3 id="assistant-guide-title">助手口径</h3>
+            <ul>
+              <li><strong>只依据本轮信息</strong><span>未提供的天气、班次与报价不会自动补全。</span></li>
+              <li><strong>建议不自动应用</strong><span>条件建议需要你另行确认。</span></li>
+              <li><strong>仅当前页面</strong><span>对话与选择不会跨刷新保存。</span></li>
+            </ul>
+          </section>
         </aside>
 
         <form className="assistant-composer" onSubmit={submit}>

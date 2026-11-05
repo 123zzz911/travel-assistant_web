@@ -588,6 +588,19 @@ export function TransportPanel({
         <span className="transport-panel__stamp">来源 · 日期 · 单位</span>
       </div>
 
+      <section className="transport-guide" aria-labelledby="transport-guide-title">
+        <div className="transport-guide__head">
+          <p className="transport-panel__eyebrow">READ ME</p>
+          <h2 id="transport-guide-title">查询口径</h2>
+          <p>班次与市内路线分开处理，缺失信息会保持待核实状态。</p>
+        </div>
+        <ul>
+          <li><strong>班次与票价</strong><span>结果保留来源、日期与计价单位。</span></li>
+          <li><strong>市内路线</strong><span>未提供线路时不绘制直线或估算路径。</span></li>
+          <li><strong>服务状态</strong><span>未配置时不展示演示班次或路线。</span></li>
+        </ul>
+      </section>
+
       <nav className="transport-tabs" aria-label="交通查询类型">
         <button
           type="button"

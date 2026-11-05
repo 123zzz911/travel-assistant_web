@@ -29,8 +29,8 @@
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: -.04em;
+  font-size: clamp(26px, 3.2vw, 32px);
+  letter-spacing: -.035em;
 }
 
 .weather-panel__subtitle {
@@ -91,7 +91,7 @@
 .weather-panel__range { margin: 22px 0 0; color: var(--ink-faint); font-family: var(--font-mono); font-size: 10px; }
 .weather-panel__coverage { margin: 14px 0 0; padding: 11px 14px; border-left: 4px solid var(--mustard); color: #604817; background: #f8f0dc; font-size: 13px; line-height: 1.65; }
 
-.weather-panel__days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+.weather-panel__days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
 .weather-day {
   min-width: 0;
   padding: 18px;

@@ -52,6 +52,17 @@ export function ItineraryPanel({ destinationName, startDate, endDate }: { destin
       <span className="itinerary-session-note">仅本页草稿 · 不会自动保存</span>
     </header>
     <p className="itinerary-destination">目的地：<strong>{destinationName}</strong> · 日期：{startDate} 至 {endDate}</p>
+    <section className="itinerary-guide" aria-labelledby="itinerary-guide-title">
+      <div className="itinerary-guide__head">
+        <p className="itinerary-step">READ ME</p>
+        <h2 id="itinerary-guide-title">行程草稿规则</h2>
+      </div>
+      <ul>
+        <li><strong>按天排布</strong><span>添加后自动按日期与时间排序。</span></li>
+        <li><strong>锁定保护</strong><span>锁定的安排不可编辑或删除，需要先手动解锁。</span></li>
+        <li><strong>不自动推荐</strong><span>不生成景点推荐，也不连接订票或地图服务。</span></li>
+      </ul>
+    </section>
     <form className="itinerary-form" onSubmit={addItem} noValidate>
       <section className="itinerary-block" aria-labelledby="add-itinerary-title">
         <div className="itinerary-block__heading"><div><p className="itinerary-step">01 / ADD</p><h2 id="add-itinerary-title">{editingId ? "编辑安排" : "添加一项安排"}</h2></div><p>地点、票价与路线请以已核实信息为准</p></div>

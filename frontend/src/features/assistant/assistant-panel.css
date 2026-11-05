@@ -1,6 +1,6 @@
 .assistant-page { max-width: 1020px; margin: 0 auto; }
 .assistant-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 8px 0 28px; border-bottom: 1px solid var(--line-strong); }
-.assistant-heading h1 { margin: 0; font-family: var(--font-display); font-size: clamp(32px, 4vw, 42px); line-height: 1.2; letter-spacing: -.04em; }
+.assistant-heading h1 { margin: 0; font-family: var(--font-display); font-size: clamp(34px, 4vw, 46px); line-height: 1.15; letter-spacing: -.04em; }
 .assistant-heading p:last-child { margin: 8px 0 0; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
 .assistant-eyebrow { margin: 0 0 9px; color: var(--rust); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .12em; }
 .assistant-session-note { flex: 0 0 auto; padding: 8px 11px; border: 1px solid var(--mustard); border-left: 4px solid var(--mustard); background: #f8f0dc; color: #604817; font-size: 12px; }
@@ -93,3 +93,10 @@
 @media (prefers-reduced-motion: reduce) {
   .assistant-send { transition: none; }
 }
+
+.assistant-guide { padding: 13px 12px; border: 1px solid var(--line); border-left: 3px solid var(--mustard); background: var(--paper-light); }
+.assistant-guide h3 { margin: 0 0 9px; font-family: var(--font-display); font-size: 15px; letter-spacing: -.01em; }
+.assistant-guide ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.assistant-guide li { display: grid; gap: 2px; }
+.assistant-guide strong { color: var(--ink); font-size: 11px; }
+.assistant-guide span { color: var(--ink-faint); font-size: 11px; line-height: 1.55; }

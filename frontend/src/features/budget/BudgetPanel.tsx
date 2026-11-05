@@ -99,6 +99,18 @@ export function BudgetPanel({ destinationName }: { destinationName: string }) {
       </header>
       <p className="budget-destination">目的地：<strong>{destinationName}</strong></p>
 
+      <section className="budget-guide" aria-labelledby="budget-guide-title">
+        <div className="budget-guide__head">
+          <p className="budget-step">READ ME</p>
+          <h2 id="budget-guide-title">预算口径</h2>
+        </div>
+        <ul>
+          <li><strong>留空 ≠ 0 元</strong><span>未确认的金额请留空，计算时会按待核实处理。</span></li>
+          <li><strong>仅本页计算</strong><span>不连接平台房价、机票或其他实时报价。</span></li>
+          <li><strong>预留金由你决定</strong><span>系统不会自动替你补充预留金额。</span></li>
+        </ul>
+      </section>
+
       <form className="budget-form" onSubmit={handleSubmit} noValidate>
         <section className="budget-block" aria-labelledby="budget-setup-title">
           <div className="budget-block__heading">

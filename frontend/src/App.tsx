@@ -6,6 +6,8 @@ import { BudgetPanel } from "./features/budget/BudgetPanel";
 import { TransportPanel } from "./features/transport/TransportPanel";
 import { ItineraryPanel } from "./features/itinerary/ItineraryPanel";
 import { AssistantPanel } from "./features/assistant/AssistantPanel";
+import { ChecklistPanel } from "./features/checklist/ChecklistPanel";
+import { NotesPanel } from "./features/notes/NotesPanel";
 import type { PlaceRef } from "./features/transport/api";
 import type { components } from "./shared/api-contracts";
 import "./app.css";
@@ -56,7 +58,7 @@ function safeWeatherError(error: unknown): WeatherApiError {
 }
 
 export function App() {
-  const [activeView, setActiveView] = useState<"weather" | "budget" | "transport" | "itinerary" | "assistant">("weather");
+  const [activeView, setActiveView] = useState<"weather" | "budget" | "transport" | "itinerary" | "checklist" | "notes" | "assistant">("weather");
   const [selectedDestinationId, setSelectedDestinationId] = useState("");
   const [selectedOriginId, setSelectedOriginId] = useState("current");
   const [customOrigin, setCustomOrigin] = useState("");
@@ -305,9 +307,16 @@ export function App() {
       <main className="app-main" id="app-content">
         {!destination ? (
           <section className="destination-setup" aria-labelledby="destination-setup-title">
-            <p className="eyebrow">TRAVEL WORKSPACE / SETUP</p>
-            <h1 id="destination-setup-title">先选好目的地与出发地</h1>
-            <p className="destination-setup__copy">出发地默认尝试使用当前位置，也可以改选城市或输入地点。</p>
+            <div className="destination-setup__intro">
+              <p className="eyebrow">TRAVEL WORKSPACE / SETUP</p>
+              <h1 id="destination-setup-title">先选好目的地与出发地</h1>
+              <p className="destination-setup__copy">出发地默认尝试使用当前位置，也可以改选城市或输入地点。</p>
+              <ol className="destination-setup__steps" aria-label="开始流程">
+                <li><span>01</span><strong>选择城市</strong></li>
+                <li><span>02</span><strong>确认出发地</strong></li>
+                <li><span>03</span><strong>进入工作区</strong></li>
+              </ol>
+            </div>
             <form className="destination-setup__form" onSubmit={startWorkspace}>
               <label className="field">
                 <span className="field__label">目的城市</span>
@@ -335,23 +344,134 @@ export function App() {
               {destinationError && <p id="destination-error" className="form-error" role="alert">{destinationError}</p>}
               <button className="primary-button" type="submit">开始规划 <span aria-hidden="true">→</span></button>
             </form>
+            <aside className="destination-index" aria-label="已登记城市目录">
+              <header className="destination-index__head">
+                <span className="destination-index__kicker">CITY INDEX</span>
+                <span className="destination-index__count">05 个已登记城市</span>
+              </header>
+              <ul>
+                {CITY_OPTIONS.map((city, index) => (
+                  <li key={city.id}>
+                    <span className="destination-index__no">{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{city.name}</strong>
+                    <span className="destination-index__province">{city.province}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="destination-index__note">天气、交通与预算仅按已登记城市查询，未登记地点暂不开放。</p>
+            </aside>
+            <section className="destination-setup__modules" aria-labelledby="setup-modules-title">
+              <div className="destination-setup__modules-head">
+                <div>
+                  <p className="eyebrow">WORKSPACE / 07 MODULES</p>
+                  <h2 id="setup-modules-title">进入工作区后可以做什么</h2>
+                </div>
+                <p>所有模块共用同一目的地与日期，切换工具不会重复请求数据。</p>
+              </div>
+              <ul className="module-grid">
+                <li>
+                  <span className="module-card__no">01</span>
+                  <strong>天气</strong>
+                  <p>查询已登记城市的逐日预报，缺失日期会明确标注，不用演示数据补齐。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">02</span>
+                  <strong>预算</strong>
+                  <p>用整趟总额与费用明细计算结余；留空表示待核实，不等于 0 元。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">03</span>
+                  <strong>交通</strong>
+                  <p>班次票价与市内路线分开查询，未知金额与未核实路线保持待核实状态。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">04</span>
+                  <strong>行程</strong>
+                  <p>按天添加安排并可锁定，草稿只保存在当前页面，不连接订票或地图服务。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">05</span>
+                  <strong>清单</strong>
+                  <p>按证件、衣物、电子与应急分类勾选，进度只保存在当前页面。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">06</span>
+                  <strong>笔记</strong>
+                  <p>随手记录想法与待确认信息，笔记不会上传，也不会跨刷新保留。</p>
+                </li>
+                <li>
+                  <span className="module-card__no">07</span>
+                  <strong>AI 助手</strong>
+                  <p>只依据本轮明确提供的信息回答，条件建议需要你另行确认后才会应用。</p>
+                </li>
+              </ul>
+            </section>
           </section>
         ) : (
           <>
             <section className="workspace-bar" aria-label="当前旅行工作区">
-              <p>出发地 <strong className="workspace-origin">{originPlace.display_name}</strong><span className="workspace-origin__status" aria-live="polite">{originLocationStatus === "loading" ? "正在定位" : originLocationStatus === "error" ? "定位失败，可手动修改" : originLocationStatus === "resolved" ? "定位完成" : ""}</span> · 目的地 <strong className="workspace-destination">{destination.name}</strong></p>
+              <div className="workspace-bar__route">
+                <div className="workspace-chip">
+                  <span className="workspace-chip__label">出发地</span>
+                  <strong className="workspace-origin">{originPlace.display_name}</strong>
+                  {originLocationStatus !== "idle" && (
+                    <span className="workspace-origin__status" aria-live="polite">{originLocationStatus === "loading" ? "正在定位" : originLocationStatus === "error" ? "定位失败，可手动修改" : "定位完成"}</span>
+                  )}
+                </div>
+                <span className="workspace-bar__arrow" aria-hidden="true">→</span>
+                <div className="workspace-chip">
+                  <span className="workspace-chip__label">目的地</span>
+                  <strong className="workspace-destination">{destination.name}</strong>
+                  <span className="workspace-chip__meta">{destination.province}</span>
+                </div>
+              </div>
+              <div className="workspace-bar__meta">
+                <span className="workspace-bar__range">{startDate} → {endDate}</span>
+                <span className="workspace-bar__days">{rangeDays !== null && rangeDays > 0 ? `${rangeDays} 天` : "日期待确认"}</span>
+              </div>
               <div className="workspace-bar__actions">
                 <button type="button" className="workspace-change" onClick={() => { setDestinationDialogAction("change"); setSelectedDestinationId(destination.id); setShowDestinationDialog(true); }}>更换目的地</button>
                 <button type="button" className="workspace-change" onClick={() => { setDestinationDialogAction("return"); setSelectedDestinationId(""); setShowDestinationDialog(true); }}>返回选择城市</button>
               </div>
             </section>
-            <nav className="feature-nav" aria-label="旅行工具">
-              <button type="button" aria-pressed={activeView === "weather"} onClick={() => setActiveView("weather")}>天气</button>
-              <button type="button" aria-pressed={activeView === "budget"} onClick={() => setActiveView("budget")}>预算</button>
-              <button type="button" aria-pressed={activeView === "transport"} onClick={() => setActiveView("transport")}>交通</button>
-              <button type="button" aria-pressed={activeView === "itinerary"} onClick={() => setActiveView("itinerary")}>行程</button>
-              <button type="button" aria-pressed={activeView === "assistant"} onClick={() => setActiveView("assistant")}>AI 助手</button>
-            </nav>
+            <div className="workspace-hint">
+              <span className="workspace-hint__tag">当前工作区</span>
+              <span className="workspace-hint__text">{destination.name} · {startDate} 至 {endDate}{rangeDays !== null && rangeDays > 0 ? ` · ${rangeDays} 天` : ""}</span>
+              <span className="workspace-hint__note">七个模块共享同一目的地与日期；切换工具不会重复请求数据。</span>
+            </div>
+            <div className="feature-nav__bar">
+              <nav className="feature-nav" aria-label="旅行工具">
+                <button type="button" aria-pressed={activeView === "weather"} onClick={() => setActiveView("weather")}>
+                  <span className="feature-nav__icon" aria-hidden="true">☁</span>
+                  <span className="feature-nav__text"><strong>天气</strong><small aria-hidden="true">WEATHER</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "budget"} onClick={() => setActiveView("budget")}>
+                  <span className="feature-nav__icon" aria-hidden="true">¥</span>
+                  <span className="feature-nav__text"><strong>预算</strong><small aria-hidden="true">BUDGET</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "transport"} onClick={() => setActiveView("transport")}>
+                  <span className="feature-nav__icon" aria-hidden="true">⇄</span>
+                  <span className="feature-nav__text"><strong>交通</strong><small aria-hidden="true">TRANSPORT</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "itinerary"} onClick={() => setActiveView("itinerary")}>
+                  <span className="feature-nav__icon" aria-hidden="true">☰</span>
+                  <span className="feature-nav__text"><strong>行程</strong><small aria-hidden="true">ITINERARY</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "checklist"} onClick={() => setActiveView("checklist")}>
+                  <span className="feature-nav__icon" aria-hidden="true">✓</span>
+                  <span className="feature-nav__text"><strong>清单</strong><small aria-hidden="true">CHECKLIST</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "notes"} onClick={() => setActiveView("notes")}>
+                  <span className="feature-nav__icon" aria-hidden="true">✎</span>
+                  <span className="feature-nav__text"><strong>笔记</strong><small aria-hidden="true">NOTES</small></span>
+                </button>
+                <button type="button" aria-pressed={activeView === "assistant"} onClick={() => setActiveView("assistant")}>
+                  <span className="feature-nav__icon" aria-hidden="true">✦</span>
+                  <span className="feature-nav__text"><strong>AI 助手</strong><small aria-hidden="true">ASSISTANT</small></span>
+                </button>
+              </nav>
+              <p className="feature-nav__caption">WORKSPACE / 07 MODULES</p>
+            </div>
             <dialog
               ref={destinationDialogRef}
               className="destination-dialog"
@@ -361,7 +481,7 @@ export function App() {
               onCancel={(event) => { event.preventDefault(); setShowDestinationDialog(false); setDestinationError(null); }}
             >
                   <h2 id="destination-dialog-title">{destinationDialogAction === "return" ? "返回选择城市？" : "更换目的地？"}</h2>
-                  <p id="destination-dialog-description">确认后将清除本页预算草稿、天气查询条件与结果，以及交通输入和结果。</p>
+                  <p id="destination-dialog-description">确认后将清除本页预算草稿、天气查询条件与结果，以及交通、清单与笔记状态。</p>
                   {destinationDialogAction === "change" && <label className="field">
                     <span className="field__label">新目的城市</span>
                     <select autoFocus value={selectedDestinationId} onChange={(event) => { setSelectedDestinationId(event.target.value); setDestinationError(null); }}>
@@ -441,19 +561,54 @@ export function App() {
           </form>
         </section>
 
+        <section className="weather-notes" aria-labelledby="weather-notes-title">
+          <div className="weather-notes__head">
+            <div>
+              <p className="section-kicker">02 / READ THE DATA</p>
+              <h2 id="weather-notes-title">读预报前先确认三件事</h2>
+            </div>
+            <p className="weather-notes__aside">结果随查询条件更新，不保留旧日期</p>
+          </div>
+          <div className="weather-notes__grid">
+            <div className="weather-note">
+              <span className="weather-note__no">A</span>
+              <strong>覆盖范围</strong>
+              <p>只展示已返回的实际日期；缺失日期会在结果中标注，不用演示数据补齐。</p>
+            </div>
+            <div className="weather-note">
+              <span className="weather-note__no">B</span>
+              <strong>查询上限</strong>
+              <p>单次最多 16 个当地日；超过上限会提示缩短日期范围。</p>
+            </div>
+            <div className="weather-note">
+              <span className="weather-note__no">C</span>
+              <strong>时区口径</strong>
+              <p>业务日期统一按 Asia/Shanghai 解释，页面展示的是当地日期。</p>
+            </div>
+          </div>
+        </section>
+
           <WeatherPanel cityName={destination.name} state={weatherState} />
             </div>
             <div className="workspace-view" hidden={activeView !== "budget"} key={`budget-${workspaceKey}`}><BudgetPanel destinationName={destination.name} /></div>
             <div className="workspace-view" hidden={activeView !== "transport"} key={`transport-${workspaceKey}`}><TransportPanel key={workspaceKey} initialDestination={destination.name} initialOrigin={originPlace} originLocationStatus={originLocationStatus} /></div>
             <div className="workspace-view" hidden={activeView !== "itinerary"} key={`itinerary-${workspaceKey}`}><ItineraryPanel destinationName={destination.name} startDate={startDate} endDate={endDate} /></div>
+            <div className="workspace-view" hidden={activeView !== "checklist"} key={`checklist-${workspaceKey}`}><ChecklistPanel destinationName={destination.name} startDate={startDate} endDate={endDate} /></div>
+            <div className="workspace-view" hidden={activeView !== "notes"} key={`notes-${workspaceKey}`}><NotesPanel destinationName={destination.name} startDate={startDate} endDate={endDate} /></div>
             <div className="workspace-view" hidden={activeView !== "assistant"} key={`assistant-${workspaceKey}`}><AssistantPanel destinationName={destination.name} startDate={startDate} endDate={endDate} evidence={assistantEvidence} /></div>
           </>
         )}
       </main>
 
       <footer className="site-footer">
-        <span>行旅 · 智能旅游助手</span>
-        <span>
+        <div className="site-footer__brand">
+          <span className="site-footer__mark" aria-hidden="true">行</span>
+          <div>
+            <strong>行旅 · 智能旅游助手</strong>
+            <span>WAYFINDER FIELD NOTES</span>
+          </div>
+        </div>
+        <p className="site-footer__note">
           {!destination || activeView === "weather"
             ? "天气模块仅展示已返回的实际日期覆盖"
             : activeView === "budget"
@@ -462,8 +617,13 @@ export function App() {
                 ? "交通服务未配置时不会显示演示班次或路线"
                 : activeView === "itinerary"
                   ? "行程草稿仅保存在当前页面，不连接订票或地图服务"
-                  : "AI 回答仅依据本轮明确提供的信息，条件建议不会自动应用"}
-        </span>
+                  : activeView === "checklist"
+                    ? "行前清单仅保存在当前页面，刷新后不会保留"
+                    : activeView === "notes"
+                      ? "旅行笔记仅保存在当前页面，不会上传或跨刷新保留"
+                      : "AI 回答仅依据本轮明确提供的信息，条件建议不会自动应用"}
+        </p>
+        <span className="site-footer__meta">LOCAL PREVIEW · {defaultStartDate}</span>
       </footer>
     </div>
   );

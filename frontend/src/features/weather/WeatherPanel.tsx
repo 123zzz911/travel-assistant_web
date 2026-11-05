@@ -217,6 +217,8 @@ export function WeatherSignalCard({ cityName, date, state }: WeatherSignalCardPr
 
   return (
     <aside className="hero__signal" aria-label={`${cityName}当天的天气摘要`} aria-busy={state.status === "loading"}>
+      <span className="hero__signal-frame" aria-hidden="true" />
+      <span className="hero__signal-tape" aria-hidden="true" />
       <div className="signal-card__topline">
         <span className="signal-card__label">{cityName} · 今日天气</span>
         <span className="signal-card__index" aria-hidden="true">{state.status === "success" ? (state.data.state === "demo" ? "测试" : "LIVE") : "01"}</span>
