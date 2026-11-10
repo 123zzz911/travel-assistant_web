@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import type { components } from "../../shared/api-contracts";
 import { calculateBudget, type BudgetResponse } from "./api";
@@ -15,7 +15,10 @@ type CostDraft = {
   userQuote: boolean;
 };
 
-const CATEGORIES: CostCategory[] = ["往返交通", "住宿", "餐饮", "市内交通", "门票", "活动", "其他"];
+export const COST_CATEGORIES: CostCategory[] = ["往返交通", "住宿", "餐饮", "市内交通", "门票", "活动", "其他"];
+
+/** 小机器人随机添加的一笔费用 */
+export type InjectedCost = { token: number; category: CostCategory; paid: string };
 
 function newCost(): CostDraft {
   return { id: crypto.randomUUID(), category: "往返交通", paid: "", unpaid: "", userQuote: false };
@@ -25,13 +28,30 @@ function moneyLabel(value: number | null): string {
   return formatFen(value);
 }
 
-export function BudgetPanel({ destinationName }: { destinationName: string }) {
+export function BudgetPanel({ destinationName, injectedCost }: { destinationName: string; injectedCost?: InjectedCost | null }) {
   const [total, setTotal] = useState("");
   const [reserve, setReserve] = useState("");
   const [costs, setCosts] = useState<CostDraft[]>([newCost()]);
   const [summary, setSummary] = useState<BudgetResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // 小机器人随机添加的一笔费用，接到指令后直接落入明细
+  useEffect(() => {
+    if (!injectedCost) return;
+    setCosts((current) => [...current, {
+      id: crypto.randomUUID(),
+      category: injectedCost.category,
+      paid: injectedCost.paid,
+      unpaid: "",
+      userQuote: false,
+    }]);
+    setSummary(null);
+    const timer = window.setTimeout(() => {
+      document.querySelector(".cost-list .cost-row:last-of-type")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 140);
+    return () => window.clearTimeout(timer);
+  }, [injectedCost]);
 
   function updateCost(id: string, patch: Partial<CostDraft>) {
     setCosts((current) => current.map((cost) => cost.id === id ? { ...cost, ...patch } : cost));
@@ -155,7 +175,7 @@ export function BudgetPanel({ destinationName }: { destinationName: string }) {
                 <label className="budget-field cost-category">
                   <span>类别</span>
                   <select value={cost.category} onChange={(event) => updateCost(cost.id, { category: event.target.value as CostCategory })}>
-                    {CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                    {COST_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                   </select>
                 </label>
                 <label className="budget-field">

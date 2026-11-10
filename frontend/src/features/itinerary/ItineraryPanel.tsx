@@ -1,14 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import "./itinerary-panel.css";
 
 type ItineraryItem = { id: string; date: string; time: string; title: string; note: string; locked: boolean; completed: boolean };
 
+/** 小机器人随机添加的一项安排 */
+export type InjectedItinerary = { token: number; title: string; time: string; note: string };
+
 function newItem(date: string): ItineraryItem {
   return { id: crypto.randomUUID(), date, time: "09:00", title: "", note: "", locked: false, completed: false };
 }
 
-export function ItineraryPanel({ destinationName, startDate, endDate }: { destinationName: string; startDate: string; endDate: string }) {
+export function ItineraryPanel({ destinationName, startDate, endDate, injectedItem }: { destinationName: string; startDate: string; endDate: string; injectedItem?: InjectedItinerary | null }) {
   const [items, setItems] = useState<ItineraryItem[]>([]);
   const [draft, setDraft] = useState(() => newItem(startDate));
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -21,6 +24,25 @@ export function ItineraryPanel({ destinationName, startDate, endDate }: { destin
     for (let date = start; date <= end; date = new Date(date.getTime() + 86_400_000)) result.push(date.toISOString().slice(0, 10));
     return result;
   }, [startDate, endDate]);
+
+  // 小机器人随机添加一项安排：日期在行程区间内随机取一天
+  useEffect(() => {
+    if (!injectedItem) return;
+    const date = dates[Math.floor(Math.random() * dates.length)] ?? startDate;
+    setItems((current) => [...current, {
+      id: crypto.randomUUID(),
+      date,
+      time: injectedItem.time,
+      title: injectedItem.title,
+      note: injectedItem.note,
+      locked: false,
+      completed: false,
+    }].sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`)));
+    const timer = window.setTimeout(() => {
+      document.querySelector(".itinerary-list .itinerary-item:last-of-type")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 140);
+    return () => window.clearTimeout(timer);
+  }, [injectedItem, dates, startDate]);
 
   function addItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

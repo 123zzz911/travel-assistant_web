@@ -11,6 +11,13 @@ type ChecklistItem = {
 
 const CATEGORIES = ["证件与票务", "衣物与装备", "电子设备", "健康与应急", "其他"] as const;
 
+const GROUP_IMAGES: Record<string, string> = {
+  证件与票务: "/assets/checklist/documents.jpg",
+  衣物与装备: "/assets/checklist/clothing.jpg",
+  电子设备: "/assets/checklist/electronics.jpg",
+  健康与应急: "/assets/checklist/emergency.jpg",
+};
+
 const TEMPLATE: ReadonlyArray<readonly [string, readonly string[]]> = [
   ["证件与票务", ["身份证", "预订确认单", "交通票据"]],
   ["衣物与装备", ["换洗衣物", "外套", "步行鞋"]],
@@ -96,7 +103,7 @@ export function ChecklistPanel({ destinationName, startDate, endDate }: Checklis
       <div className="checklist-layout">
         <div className="checklist-progress-card">
           <span className="checklist-progress-card__label">准备进度</span>
-          <strong className="checklist-progress-card__value">
+          <strong className="checklist-progress-card__value" key={checkedCount}>
             {checkedCount}
             <span> / {items.length}</span>
           </strong>
@@ -115,7 +122,16 @@ export function ChecklistPanel({ destinationName, startDate, endDate }: Checklis
           {grouped.map((group) => {
             const done = group.items.filter((item) => item.checked).length;
             return (
-              <section className="checklist-group" key={group.category} aria-label={`${group.category}清单`}>
+              <section
+                className={`checklist-group${group.items.length > 0 && done === group.items.length ? " is-complete" : ""}`}
+                key={group.category}
+                aria-label={`${group.category}清单`}
+              >
+                {GROUP_IMAGES[group.category] && (
+                  <div className="checklist-group__media" aria-hidden="true">
+                    <img src={GROUP_IMAGES[group.category]} alt="" loading="lazy" />
+                  </div>
+                )}
                 <header className="checklist-group__head">
                   <h2>{group.category}</h2>
                   <span>{done} / {group.items.length}</span>
